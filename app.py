@@ -39,7 +39,7 @@ def user_list():
         return redirect(url_for("home"))
 
     other_users = {uid: u["username"] for uid, u in users.items() if uid != session["user_id"]}
-    return render_template("user_list.html", users=other_users, username=session["username"])
+    return render_template("user_list.html", users=other_users, username=session["username"], active_users=active_users)
 
 @app.route("/private_chat/<target_user_id>")
 def private_chat(target_user_id):
@@ -95,5 +95,19 @@ def on_join():
     join_room(room_id)
     send({"name": session["username"], "message": "sohbete katıldı"}, to=room_id)
 
+@socketio.on("broadcast_message")
+def handle_broadcast_message(data):
+    message_data = {
+        "name": "Sistem",
+        "message": data["message"],
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+    for user_id in active_users:
+        room_id = f"{min(session['user_id'], user_id)}-{max(session['user_id'], user_id)}"
+        rooms.setdefault(room_id, []).append(message_data)  # Mesajları ilgili oda geçmişine ekleyin
+        socketio.emit("message", message_data, room=room_id)  # Mesajı odalara gönderin
+
 if __name__ == "__main__":
     socketio.run(app, debug=True)
+
+##gitdeneme

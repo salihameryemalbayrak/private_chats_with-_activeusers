@@ -6,9 +6,6 @@
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        .active {
-            color: green;
-        }
         .status-dot {
             height: 10px;
             width: 10px;
@@ -38,7 +35,11 @@
     <ul id="active-users">
         <!-- Aktif kullanıcılar Socket.IO ile buraya eklenecek -->
     </ul>
-    
+
+    <!-- Broadcast mesaj göndermek için TextBox ve Buton -->
+    <input type="text" id="broadcast-message" placeholder="Aktif kullanıcılara mesaj gönder">
+    <button onclick="sendBroadcastMessage()">Gönder</button>
+
     <p><a href="{{ url_for('home') }}">Çıkış Yap</a></p>
 
     <script>
@@ -55,6 +56,14 @@
                 activeUsersList.append(`<li>${username}</li>`);
             }
         });
+
+        function sendBroadcastMessage() {
+            const message = $("#broadcast-message").val();
+            if (message) {
+                socket.emit("broadcast_message", { message: message });
+                $("#broadcast-message").val("");
+            }
+        }
     </script>
 </body>
 </html>
