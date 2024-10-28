@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kullanıcı Listesi</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .active {
+            color: green;
+        }
+        .status-dot {
+            height: 10px;
+            width: 10px;
+            background-color: green;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Kullanıcılar</h2>
+    <ul>
+        {% for user_id, user_name in users.items() %}
+            <li>
+                <a href="{{ url_for('private_chat', target_user_id=user_id) }}">
+                    {{ user_name }}
+                    {% if user_id in active_users %}
+                        <span class="status-dot"></span>
+                    {% endif %}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Aktif Kullanıcılar</h2>
+    <ul id="active-users">
+        <!-- Aktif kullanıcılar Socket.IO ile buraya eklenecek -->
+    </ul>
+    
+    <p><a href="{{ url_for('home') }}">Çıkış Yap</a></p>
+
+    <script>
+        const socket = io();
+
+        socket.on("connect", () => {
+            console.log("Sunucuya bağlandı.");
+        });
+
+        socket.on("active_users", (activeUsers) => {
+            const activeUsersList = $("#active-users");
+            activeUsersList.empty();
+            for (const [userId, username] of Object.entries(activeUsers)) {
+                activeUsersList.append(`<li>${username}</li>`);
+            }
+        });
+    </script>
+</body>
+</html>
