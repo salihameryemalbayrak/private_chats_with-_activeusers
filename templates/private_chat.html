@@ -35,6 +35,11 @@
             font-size: 0.8em;
             align-self: flex-end;
         }
+        .status {
+            color: #888;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
         input[type="text"] {
             width: calc(100% - 20px);
             padding: 10px;
@@ -64,6 +69,7 @@
                     <strong>{{ message.name }}</strong>
                     <span>{{ message.message }}</span>
                     <span class="timestamp">at {{ message.timestamp }}</span>
+                    <span class="status">{{ message.status }}</span>
                 </div>
             {% endfor %}
         </div>
@@ -84,8 +90,17 @@
                     <strong>${data.name}</strong>
                     <span>${data.message}</span>
                     <span class="timestamp">at ${data.timestamp}</span>
+                    <span class="status">${data.status}</span>
                 </div>
             `);
+        });
+
+        socket.on("message_status_update", (data) => {
+            $("#chat .message").each(function () {
+                if ($(this).find(".timestamp").text() === `at ${data.timestamp}`) {
+                    $(this).find(".status").text(data.status);
+                }
+            });
         });
 
         function sendMessage() {
