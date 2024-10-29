@@ -1,0 +1,6 @@
+
+burayı bilmiyom
+
+git add .
+git commit -m "guncelleme"
+git push
