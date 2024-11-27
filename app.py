@@ -83,22 +83,31 @@ def handle_message(data):
     if not room_id:
         return
 
+    # Oda ID'sinden alıcıyı belirle
+    user_ids = room_id.split("-")
+
+       # Gönderen kimliği, session içindeki kullanıcı kimliği
+    sender_user_id = session["user_id"]
+
+    # Alıcıyı belirle: Gönderenin dışındaki kullanıcı
+    target_user_id = user_ids[1] if user_ids[1] == sender_user_id else user_ids[0]
+
+    # Mesaj verisini oluştur ve alıcıyı ekle
     message_data = {
         "name": session["username"],
+        "receiver": target_user_id,  # Alıcı bilgisi
         "message": data["message"],
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "status": "Gönderildi"
     }
 
-    target_user_id = room_id.replace(session["user_id"], "").replace("-", "")
-
-    # Eğer hedef kullanıcı aktif ama odada değilse durumu "İletildi" olarak güncelleriz
-    if target_user_id in active_users and target_user_id not in room_active_users.get(room_id, []):
-        message_data["status"] = "İletildi"
-
+    # Mesajı depola
     rooms[room_id].append(message_data)
+
+    # Mesajı tüm oda üyelerine gönder
     send(message_data, to=room_id)
-    emit("message_status_update", message_data, to=room_id)  # Durum güncellemesini göndeririz
+    emit("message_status_update", message_data, to=room_id)
+
 
 @socketio.on("join")
 def on_join():

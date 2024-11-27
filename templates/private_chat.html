@@ -65,12 +65,13 @@
         <h2>Özel Sohbet - {{ target_user }}</h2>
         <div id="chat">
             {% for message in messages %}
-                <div class="message">
-                    <strong>{{ message.name }}</strong>
-                    <span>{{ message.message }}</span>
-                    <span class="timestamp">at {{ message.timestamp }}</span>
-                    <span class="status">{{ message.status }}</span>
-                </div>
+            <div class="message">
+                <strong>{{ message.name }}</strong>
+                <span>{{ message.message }}</span>
+                <span class="timestamp">at {{ message.timestamp }}</span>
+                <span class="status">{{ message.status }}</span>
+            </div>
+            
             {% endfor %}
         </div>
         <input type="text" id="message" placeholder="Mesajınızı yazın...">
@@ -84,17 +85,18 @@
             socket.emit("join");
         });
 
+        
         socket.on("message", (data) => {
-            $("#chat").append(`
-                <div class="message">
-                    <strong>${data.name}</strong>
-                    <span>${data.message}</span>
-                    <span class="timestamp">at ${data.timestamp}</span>
-                    <span class="status">${data.status}</span>
-                </div>
-            `);
-        });
-
+    $("#chat").append(`
+        <div class="message">
+            <strong>${data.name}</strong>
+            <span>${data.message}</span>
+            <span class="timestamp">at ${data.timestamp}</span>
+            <span class="receiver">to ${data.receiver}</span>
+            <span class="status">${data.status}</span>
+        </div>
+    `);
+});
         socket.on("message_status_update", (data) => {
             $("#chat .message").each(function () {
                 if ($(this).find(".timestamp").text() === `at ${data.timestamp}`) {
